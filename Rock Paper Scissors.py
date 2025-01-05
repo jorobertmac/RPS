@@ -19,8 +19,8 @@ class Character:
         self.height = self.image.get_height()
         self.x = x
         self.y = y
-        self.x_direction = choice([1, -1])
-        self.y_direction = choice([1, -1])
+        self.x_direction = 1
+        self.y_direction = 1
 
     def draw(self, surface: pygame.Surface):
         surface.blit(self.image, (self.x, self.y))
@@ -37,21 +37,13 @@ class Character:
         if self.y >= w-self.height:
             self.y_direction = -1
         self.y += self.y_direction
-
-    def left(self):
-        return self.x
-    def right(self):
-        return self.x + self.width
-    def top(self):
-        return self.y
-    def bottom(self):
-        return self.y + self.height
-    
-        
     
     def collide(self, other: "Character"):
-        if self.right() >= other.left() and self.left() <= other.right() and self.bottom() <= other.top() and self.top() >= other.bottom():
-            print(f"Collision: {self} and {other}")
+        if self.x + self.width > other.x and self.x < other.x + other.width and self.y + self.height < other.y and self.y > other.y + other.height:
+            self.x = 1
+            other.x = w - self.width
+            self.y = 1
+            other.y = h - self.height
             
 
 characters: list[Character] = []
