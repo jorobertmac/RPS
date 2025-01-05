@@ -1,7 +1,7 @@
 import pygame
 import math
 import sys
-from random import randint
+from random import randint, choice
 
 pygame.init()
 
@@ -19,8 +19,8 @@ class Character:
         self.height = self.image.get_height()
         self.x = x
         self.y = y
-        self.x_direction = 1
-        self.y_direction = 1
+        self.x_direction = choice([1, -1])
+        self.y_direction = choice([1, -1])
 
     def draw(self, surface: pygame.Surface):
         surface.blit(self.image, (self.x, self.y))
@@ -50,32 +50,8 @@ class Character:
         
     
     def collide(self, other: "Character"):
-        if self.right() >= other.left() and self.left() <= other.right() and self.top() >= other.bottom() and self.bottom() <= other.top():
+        if self.right() >= other.left() and self.left() <= other.right() and self.bottom() <= other.top() and self.top() >= other.bottom():
             print(f"Collision: {self} and {other}")
-
-        if self.x+self.width >= other.x and self.x <= other.x+other.width and self.y+self.height >= other.y and self.y <= other.y+other.height:
-            # self.x_direction *= -1
-            # other.x_direction *= -1
-            # self.y_direction *= -1
-            # other.y_direction *= -1
-
-            if self.x+self.width > other.x:
-                self.x_direction *= -1
-                other.x_direction *= -1
-                # self.x = other.x-self.width
-            elif self.x > other.x:
-                self.x_direction *= -1
-                other.x_direction *= -1
-                # other.x = self.x-other.width
-
-            elif self.y+self.height <other.y+other.height:
-                self.y_direction *= -1
-                other.y_direction *= -1
-                # self.y = other.y-self.height
-            elif self.y > other.y:
-                self.y_direction *= -1
-                other.y_direction *= -1
-                # other.y = self.y-other.height
             
 
 characters: list[Character] = []
