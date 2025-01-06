@@ -42,15 +42,15 @@ class Character:
     def collide(self, other: "Character"):
         if self.x + self.width >= other.x and self.x <= other.x + other.width and self.y + self.height >= other.y and self.y <= other.y + other.height:
             if self.x >= other.x and self.y <= other.y:
-                self.x_direction = 1.2
-                self.y_direction = -1.2
-                other.x_direction = -1.2
-                other.y_direction = 1.2
+                self.x_direction = 1
+                self.y_direction = -1
+                other.x_direction = -1
+                other.y_direction = 1
             else:
-                self.x_direction *= -1.1
-                other.x_direction *= -1.1
-                self.y_direction *= -1.1
-                other.y_direction *= -1.1
+                self.x_direction *= -1
+                other.x_direction *= -1
+                self.y_direction *= -1
+                other.y_direction *= -1
             if self.type == "rock":
                 if other.type == "scissors":
                     other.image = rock
@@ -76,7 +76,7 @@ class Character:
             
 
 characters: list[Character] = []
-for _ in range(7):
+for _ in range(20):
     characters.append(Character(rock, randint(0, w-rock.get_width()), randint(0, h-rock.get_height()), type="rock"))
     characters.append(Character(paper, randint(0, w-paper.get_width()), randint(0, h-paper.get_height()), type="paper"))
     characters.append(Character(scissors, randint(0, w-scissors.get_width()), randint(0, h-scissors.get_height()), type="scissors"))
