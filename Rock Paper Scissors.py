@@ -41,8 +41,8 @@ class Character:
     def unlock_collision(self, other: "Character"):
         abs_x = abs(self.x - other.x)
         abs_y = abs(self.y - other.y)
+        offset = 1
         if abs_x >= abs_y:
-            offset = 2
             if self.x >= other.x:
                 self.x = other.x+other.width + offset
             else:
