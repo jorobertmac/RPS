@@ -1,6 +1,6 @@
 import pygame
-import math
 import sys
+import math
 from random import randint, choice
 
 pygame.init()
@@ -13,7 +13,7 @@ paper = pygame.image.load("paper.png")
 scissors = pygame.image.load("scissors.png")
 
 class Character:
-    def __init__(self, image: pygame.Surface, x: int, y: int, type = None) -> None:
+    def __init__(self, image: pygame.Surface, x: int, y: int) -> None:
         self.image = image
         self.width = self.image.get_width()
         self.height = self.image.get_height()
@@ -21,7 +21,6 @@ class Character:
         self.y = y
         self.x_direction = choice([-1, 1])
         self.y_direction = choice([-1, 1])
-        self.type = type
 
     def draw(self, surface: pygame.Surface):
         surface.blit(self.image, (self.x, self.y))
@@ -39,53 +38,68 @@ class Character:
             self.y_direction = -1
         self.y += self.y_direction
     
-    def collide(self, other: "Character"):
-        if self.x + self.width >= other.x and self.x <= other.x + other.width and self.y + self.height >= other.y and self.y <= other.y + other.height:
-            # if self.x >= other.x and self.y <= other.y:
-            #     self.x_direction = 1
-            #     self.y_direction = -1
-            #     other.x_direction = -1
-            #     other.y_direction = 1
-            # else:
+    def unlock_collision(self, other: "Character"):
+        abs_x = abs(self.x - other.x)
+        abs_y = abs(self.y - other.y)
+        if abs_x >= abs_y:
+            if self.x >= other.x:
+                self.x = other.x+other.width
+            else:
+                other.x = self.x+self.width
+        else:
+            if self.y >= other.y:
+                self.y = other.y+other.height
+            else:
+                other.y = self.y+self.height
+
+    
+    def check_collision(self, other: "Character"):
+        return self.x + self.width >= other.x and self.x <= other.x + other.width and self.y + self.height >= other.y and self.y <= other.y + other.height
+    def change_x_direction(self):
             self.x_direction *= -1
-            other.x_direction *= -1
+    def change_y_direction(self):
             self.y_direction *= -1
-            other.y_direction *= -1
-            if self.type == "rock":
-                if other.type == "scissors":
-                    other.image = rock
-                    other.type = "rock"
-                elif other.type == "paper":
-                    self.image = paper
-                    self.type = "paper"
-            elif self.type == "paper":
-                if other.type == "scissors":
-                    self.image = scissors
-                    self.type = "scissors"
-                elif other.type == "rock":
-                    other.image = paper
-                    other.type = "paper"
-            elif self.type == "scissors":
-                if other.type == "rock":
-                    self.image = rock
-                    self.type = "rock"
-                elif other.type == "paper":
-                    other.image = scissors
-                    other.type = "scissors"
-                    
+    def change_image(self, image):
+        self.image = image
+    def collision_winner(self, other: "Character"):
+        # CHECK ROCK
+        if self.image == rock and other.image == scissors:
+            other.change_image(rock)
+        elif self.image == rock and other.image == paper:
+            self.change_image(paper)
+        # CHECK PAPER
+        elif self.image == paper and other.image == rock:
+            other.change_image(paper)
+        elif self.image == paper and other.image == scissors:
+            self.change_image(scissors)
+        # CHECK SCISSORS
+        elif self.image == scissors and other.image == paper:
+            other.change_image(scissors)
+        elif self.image == scissors and other.image == rock:
+            self.change_image(rock)
+
+
+    def collide(self, other: "Character"):
+        if self.check_collision(other):
+            self.unlock_collision(other)
+            self.change_x_direction()
+            other.change_x_direction()
+            self.change_y_direction()
+            other.change_y_direction()
+            self.collision_winner(other)
             
 
 characters: list[Character] = []
 def validate(self: Character, other: Character):
-    while self.x + self.width >= other.x and self.x <= other.x + other.width and self.y + self.height >= other.y and self.y <= other.y + other.height:
+    while self.check_collision(other):
         self.x -= 1
         self.y -= 1
 
 
 for _ in range(20):
-    characters.append(Character(rock, randint(0, w-rock.get_width()), randint(0, h-rock.get_height()), type="rock"))
-    characters.append(Character(paper, randint(0, w-paper.get_width()), randint(0, h-paper.get_height()), type="paper"))
-    characters.append(Character(scissors, randint(0, w-scissors.get_width()), randint(0, h-scissors.get_height()), type="scissors"))
+    characters.append(Character(rock, randint(0, w-rock.get_width()), randint(0, h-rock.get_height())))
+    characters.append(Character(paper, randint(0, w-paper.get_width()), randint(0, h-paper.get_height())))
+    characters.append(Character(scissors, randint(0, w-scissors.get_width()), randint(0, h-scissors.get_height())))
 
 for i, character in enumerate(characters):
     for j in range(i+1, len(characters)):
