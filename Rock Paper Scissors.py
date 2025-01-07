@@ -42,15 +42,16 @@ class Character:
         abs_x = abs(self.x - other.x)
         abs_y = abs(self.y - other.y)
         if abs_x >= abs_y:
+            offset = 2
             if self.x >= other.x:
-                self.x = other.x+other.width
+                self.x = other.x+other.width + offset
             else:
-                other.x = self.x+self.width
+                other.x = self.x+self.width + offset
         else:
             if self.y >= other.y:
-                self.y = other.y+other.height
+                self.y = other.y+other.height + offset
             else:
-                other.y = self.y+self.height
+                other.y = self.y+self.height + offset
 
     
     def check_collision(self, other: "Character"):
