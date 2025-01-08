@@ -164,6 +164,7 @@ def run():
                 return (255,0,0)
             return white
 
+        # UPDATE SCORES
         rock_text = score_font.render("Rock:", False, score_color("rock"))
         paper_text = score_font.render("Paper:", False, score_color("paper"))
         scissors_text = score_font.render("Scissors:", False, score_color("scissors"))
@@ -172,6 +173,7 @@ def run():
         paper_score = score_font.render(f"{totals['paper']:02}", False, score_color("paper"))
         scissors_score = score_font.render(f"{totals['scissors']:02}", False, score_color("scissors"))
         
+        # UPDATE CHARACTERS
         for i, character in enumerate(characters):
             for j in range(i+1, len(characters)):
                 character.collide(characters[j])
