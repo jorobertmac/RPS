@@ -143,6 +143,48 @@ pygame.display.set_caption("Pock, Scaper, Rissors")
 
 clock = pygame.time.Clock()
 
+def play_loop():
+    totals = count_characters(characters)
+    def score_color(character: str):
+        scores = [totals["rock"], totals["paper"], totals["scissors"]]
+        if totals[character] == 0:
+            return black
+        elif totals[character] == max(scores):
+            return (0,255,0)
+        elif totals[character] == min(scores):
+            return (255,0,0)
+        return white
+
+    # UPDATE SCORES
+    rock_text = score_font.render("Rock:", False, score_color("rock"))
+    paper_text = score_font.render("Paper:", False, score_color("paper"))
+    scissors_text = score_font.render("Scissors:", False, score_color("scissors"))
+    
+    rock_score = score_font.render(f"{totals['rock']:02}", False, score_color("rock"))
+    paper_score = score_font.render(f"{totals['paper']:02}", False, score_color("paper"))
+    scissors_score = score_font.render(f"{totals['scissors']:02}", False, score_color("scissors"))
+    
+    # UPDATE CHARACTERS
+    for i, character in enumerate(characters):
+        for j in range(i+1, len(characters)):
+            character.collide(characters[j])
+    for character in characters:
+        character.move()
+    
+    
+    #DRAW ON SCREEN
+    screen.fill(dark_gray)
+
+    for character in characters:
+        character.draw(screen)
+    
+    screen.blit(rock_text, (10, h-rock_text.get_height()-10))
+    screen.blit(paper_text, (w/2-paper_text.get_width()/2-50, h-paper_text.get_height()-10))
+    screen.blit(scissors_text, (w-scissors_text.get_width()-50-10, h-scissors_text.get_height()-10))
+
+    screen.blit(rock_score, (rock_text.get_width()+ 10 + 10, h-rock_score.get_height()-10))
+    screen.blit(paper_score, (w/2 + paper_score.get_width()/2, h-paper_score.get_height()-10))
+    screen.blit(scissors_score, (w-scissors_score.get_width()-10, h-scissors_score.get_height()-10))
 
 def run():
     running = True
@@ -153,47 +195,7 @@ def run():
                 running = False
         
         #GAME LOGIG
-        totals = count_characters(characters)
-        def score_color(character: str):
-            scores = [totals["rock"], totals["paper"], totals["scissors"]]
-            if totals[character] == 0:
-                return black
-            elif totals[character] == max(scores):
-                return (0,255,0)
-            elif totals[character] == min(scores):
-                return (255,0,0)
-            return white
-
-        # UPDATE SCORES
-        rock_text = score_font.render("Rock:", False, score_color("rock"))
-        paper_text = score_font.render("Paper:", False, score_color("paper"))
-        scissors_text = score_font.render("Scissors:", False, score_color("scissors"))
-        
-        rock_score = score_font.render(f"{totals['rock']:02}", False, score_color("rock"))
-        paper_score = score_font.render(f"{totals['paper']:02}", False, score_color("paper"))
-        scissors_score = score_font.render(f"{totals['scissors']:02}", False, score_color("scissors"))
-        
-        # UPDATE CHARACTERS
-        for i, character in enumerate(characters):
-            for j in range(i+1, len(characters)):
-                character.collide(characters[j])
-        for character in characters:
-            character.move()
-        
-        
-        #DRAW ON SCREEN
-        screen.fill(dark_gray)
-
-        for character in characters:
-            character.draw(screen)
-        
-        screen.blit(rock_text, (10, h-rock_text.get_height()-10))
-        screen.blit(paper_text, (w/2-paper_text.get_width()/2-50, h-paper_text.get_height()-10))
-        screen.blit(scissors_text, (w-scissors_text.get_width()-50-10, h-scissors_text.get_height()-10))
-
-        screen.blit(rock_score, (rock_text.get_width()+ 10 + 10, h-rock_score.get_height()-10))
-        screen.blit(paper_score, (w/2 + paper_score.get_width()/2, h-paper_score.get_height()-10))
-        screen.blit(scissors_score, (w-scissors_score.get_width()-10, h-scissors_score.get_height()-10))
+        play_loop()
         
         #UPDATE SCREEN
         pygame.display.flip()
