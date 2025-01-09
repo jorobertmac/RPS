@@ -6,21 +6,26 @@ from random import randint, choice
 pygame.init()
 pygame.font.init()
 
-
+# CONSTANTS
 w, h = 800, 800
 chars = 20
 black = (0,0,0)
 dark_gray = (30,30,30)
 white = (255,255,255)
 
+screen = pygame.display.set_mode((w,h))
+pygame.display.set_caption("Pock, Scaper, Rissors")
+clock = pygame.time.Clock()
+
 #IMAGES
 rock = pygame.image.load("rock.png")
 paper = pygame.image.load("paper.png")
 scissors = pygame.image.load("scissors.png")
 
-# FONTS AND TEXT
+# FONTS
 score_font = pygame.font.SysFont("Ariel", 60)
-
+game_over_font = pygame.font.SysFont("Ariel", 150)
+play_again_font = pygame.font.SysFont("Ariel", 60)
 
 class Character:
     def __init__(self, image: pygame.Surface, x: int, y: int) -> None:
@@ -132,17 +137,24 @@ def count_characters(list: list[Character]):
             total_scissors += 1
     return {"rock": total_rock, "paper": total_paper, "scissors": total_scissors}
 
+# MAKE CHARACTERS AND APPEND TO -characters- LIST
+# for _ in range(chars):
+#     characters.append(Character(rock, randint(0, w-rock.get_width()), randint(0, h-rock.get_height())))
+#     characters.append(Character(paper, randint(0, w-paper.get_width()), randint(0, h-paper.get_height())))
+#     characters.append(Character(scissors, randint(0, w-scissors.get_width()), randint(0, h-scissors.get_height())))
 
-for _ in range(chars):
+# TEST
+for _ in range(55):
     characters.append(Character(rock, randint(0, w-rock.get_width()), randint(0, h-rock.get_height())))
-    characters.append(Character(paper, randint(0, w-paper.get_width()), randint(0, h-paper.get_height())))
+for _ in range(5):
     characters.append(Character(scissors, randint(0, w-scissors.get_width()), randint(0, h-scissors.get_height())))
 
-screen = pygame.display.set_mode((w,h))
-pygame.display.set_caption("Pock, Scaper, Rissors")
 
-clock = pygame.time.Clock()
+# START SCREEN
+def start_screen():
+    ...
 
+# MAIN GAME LOOP
 def play_loop():
     totals = count_characters(characters)
     def score_color(character: str):
@@ -156,9 +168,9 @@ def play_loop():
         return white
 
     # UPDATE SCORES
-    rock_text = score_font.render("Rock:", False, score_color("rock"))
-    paper_text = score_font.render("Paper:", False, score_color("paper"))
-    scissors_text = score_font.render("Scissors:", False, score_color("scissors"))
+    rock_text = score_font.render("rock:", False, score_color("rock"))
+    paper_text = score_font.render("paper:", False, score_color("paper"))
+    scissors_text = score_font.render("scissors:", False, score_color("scissors"))
     
     rock_score = score_font.render(f"{totals['rock']:02}", False, score_color("rock"))
     paper_score = score_font.render(f"{totals['paper']:02}", False, score_color("paper"))
@@ -186,6 +198,18 @@ def play_loop():
     screen.blit(paper_score, (w/2 + paper_score.get_width()/2, h-paper_score.get_height()-10))
     screen.blit(scissors_score, (w-scissors_score.get_width()-10, h-scissors_score.get_height()-10))
 
+# GAME OVER
+def game_over():
+    game_over_text = game_over_font.render("GAME OVER!", False, white)
+    play_again_text = play_again_font.render("PLAY AGAIN", False, white)
+    render = screen.blit(game_over_text, (w/2-game_over_text.get_width()/2, h/2-game_over_text.get_height()))
+    render
+    screen.blit(play_again_text, (render.centerx, render.bottom))
+
+
+        
+
+
 def run():
     running = True
     while running:
@@ -196,6 +220,8 @@ def run():
         
         #GAME LOGIG
         play_loop()
+        if len(characters) in [score for char, score in count_characters(characters).items()]:
+            game_over()
         
         #UPDATE SCREEN
         pygame.display.flip()
