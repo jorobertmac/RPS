@@ -138,18 +138,22 @@ def count_characters(list: list[Character]):
     return {"rock": total_rock, "paper": total_paper, "scissors": total_scissors}
 
 # MAKE CHARACTERS AND APPEND TO -characters- LIST
-# for _ in range(chars):
-#     characters.append(Character(rock, randint(0, w-rock.get_width()), randint(0, h-rock.get_height())))
-#     characters.append(Character(paper, randint(0, w-paper.get_width()), randint(0, h-paper.get_height())))
-#     characters.append(Character(scissors, randint(0, w-scissors.get_width()), randint(0, h-scissors.get_height())))
+test = True
+def make_characters():
+    if not test:
+        for _ in range(chars):
+            characters.append(Character(rock, randint(0, w-rock.get_width()), randint(0, h-rock.get_height())))
+            characters.append(Character(paper, randint(0, w-paper.get_width()), randint(0, h-paper.get_height())))
+            characters.append(Character(scissors, randint(0, w-scissors.get_width()), randint(0, h-scissors.get_height())))
 
-# TEST
-for _ in range(55):
-    characters.append(Character(rock, randint(0, w-rock.get_width()), randint(0, h-rock.get_height())))
-for _ in range(5):
-    characters.append(Character(scissors, randint(0, w-scissors.get_width()), randint(0, h-scissors.get_height())))
+    # TEST
+    else:
+        for _ in range(55):
+            characters.append(Character(rock, randint(0, w-rock.get_width()), randint(0, h-rock.get_height())))
+        for _ in range(5):
+            characters.append(Character(scissors, randint(0, w-scissors.get_width()), randint(0, h-scissors.get_height())))
 
-
+make_characters()
 # START SCREEN
 def start_screen():
     ...
@@ -158,7 +162,8 @@ def start_screen():
 def play_loop():
     running = True
     while running:
-        for event in pygame.event.get():
+        pygame_events = pygame.event.get()
+        for event in pygame_events:
             if event.type == pygame.QUIT:
                 running = False
                 pygame.quit()
@@ -215,9 +220,11 @@ def play_loop():
 
 # GAME OVER
 def game_over():
+    pygame_events = pygame.event.get()
+
     game_over_text = "game over"
-    play_again_text = "play again"
-    quit_text = "quit"
+    play_again_text = '"N" new game'
+    quit_text = '"Q" quit'
 
     game_over_surface = large_font.render(game_over_text, False, white)
     game_over_rect = game_over_surface.get_rect(centerx=w//2, bottom=h//2)
@@ -232,8 +239,17 @@ def game_over():
     
     if play_again_rect.collidepoint(mouse_pos):
         play_again_surface = main_font.render(play_again_text, False, red)
+        for event in pygame_events:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                characters.clear()
+                make_characters()
+
     if quit_rect.collidepoint(mouse_pos):
         quit_surface = main_font.render(quit_text, False, red)
+        for event in pygame_events:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pygame.quit()
+                sys.exit()
     
     screen.blit(game_over_surface, game_over_rect)
     screen.blit(play_again_surface, play_again_rect)
@@ -245,7 +261,7 @@ def game_over():
 def run():
     running = True
     while running:
-        #EVENT HANDLING
+        # EVENT HANDLING
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
