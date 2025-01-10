@@ -12,6 +12,7 @@ chars = 20
 black = (0,0,0)
 dark_gray = (30,30,30)
 white = (255,255,255)
+red = (255, 15, 15)
 
 screen = pygame.display.set_mode((w,h))
 pygame.display.set_caption("Pock, Scaper, Rissors")
@@ -23,9 +24,8 @@ paper = pygame.image.load("paper.png")
 scissors = pygame.image.load("scissors.png")
 
 # FONTS
-score_font = pygame.font.SysFont("Ariel", 60)
-game_over_font = pygame.font.SysFont("Ariel", 150)
-play_again_font = pygame.font.SysFont("Ariel", 60)
+main_font = pygame.font.SysFont("Ariel", 60)
+large_font = pygame.font.SysFont("Ariel", 150)
 
 class Character:
     def __init__(self, image: pygame.Surface, x: int, y: int) -> None:
@@ -156,58 +156,90 @@ def start_screen():
 
 # MAIN GAME LOOP
 def play_loop():
-    totals = count_characters(characters)
-    def score_color(character: str):
-        scores = [totals["rock"], totals["paper"], totals["scissors"]]
-        if totals[character] == 0:
-            return black
-        elif totals[character] == max(scores):
-            return (0,255,0)
-        elif totals[character] == min(scores):
-            return (255,0,0)
-        return white
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                pygame.quit()
+                sys.exit()
+        
+        totals = count_characters(characters)
 
-    # UPDATE SCORES
-    rock_text = score_font.render("rock:", False, score_color("rock"))
-    paper_text = score_font.render("paper:", False, score_color("paper"))
-    scissors_text = score_font.render("scissors:", False, score_color("scissors"))
-    
-    rock_score = score_font.render(f"{totals['rock']:02}", False, score_color("rock"))
-    paper_score = score_font.render(f"{totals['paper']:02}", False, score_color("paper"))
-    scissors_score = score_font.render(f"{totals['scissors']:02}", False, score_color("scissors"))
-    
-    # UPDATE CHARACTERS
-    for i, character in enumerate(characters):
-        for j in range(i+1, len(characters)):
-            character.collide(characters[j])
-    for character in characters:
-        character.move()
-    
-    
-    #DRAW ON SCREEN
-    screen.fill(dark_gray)
+        def score_color(character: str):
+            scores = [totals["rock"], totals["paper"], totals["scissors"]]
+            if totals[character] == 0:
+                return black
+            elif totals[character] == max(scores):
+                return (0,255,0)
+            elif totals[character] == min(scores):
+                return (255,0,0)
+            return white
 
-    for character in characters:
-        character.draw(screen)
-    
-    screen.blit(rock_text, (10, h-rock_text.get_height()-10))
-    screen.blit(paper_text, (w/2-paper_text.get_width()/2-50, h-paper_text.get_height()-10))
-    screen.blit(scissors_text, (w-scissors_text.get_width()-50-10, h-scissors_text.get_height()-10))
+        # UPDATE SCORES
+        rock_text = main_font.render("rock:", False, score_color("rock"))
+        paper_text = main_font.render("paper:", False, score_color("paper"))
+        scissors_text = main_font.render("scissors:", False, score_color("scissors"))
+        
+        rock_score = main_font.render(f"{totals['rock']:02}", False, score_color("rock"))
+        paper_score = main_font.render(f"{totals['paper']:02}", False, score_color("paper"))
+        scissors_score = main_font.render(f"{totals['scissors']:02}", False, score_color("scissors"))
+        
+        # UPDATE CHARACTERS
+        for i, character in enumerate(characters):
+            for j in range(i+1, len(characters)):
+                character.collide(characters[j])
+        for character in characters:
+            character.move()
+        
+        
+        #DRAW ON SCREEN
+        screen.fill(dark_gray)
 
-    screen.blit(rock_score, (rock_text.get_width()+ 10 + 10, h-rock_score.get_height()-10))
-    screen.blit(paper_score, (w/2 + paper_score.get_width()/2, h-paper_score.get_height()-10))
-    screen.blit(scissors_score, (w-scissors_score.get_width()-10, h-scissors_score.get_height()-10))
+        for character in characters:
+            character.draw(screen)
+        
+        screen.blit(rock_text, (10, h-rock_text.get_height()-10))
+        screen.blit(paper_text, (w/2-paper_text.get_width()/2-50, h-paper_text.get_height()-10))
+        screen.blit(scissors_text, (w-scissors_text.get_width()-50-10, h-scissors_text.get_height()-10))
+
+        screen.blit(rock_score, (rock_text.get_width()+ 10 + 10, h-rock_score.get_height()-10))
+        screen.blit(paper_score, (w/2 + paper_score.get_width()/2, h-paper_score.get_height()-10))
+        screen.blit(scissors_score, (w-scissors_score.get_width()-10, h-scissors_score.get_height()-10))
+
+        if len(characters) in [score for char, score in count_characters(characters).items()]:
+            game_over()
+        #UPDATE SCREEN
+        pygame.display.flip()
+        clock.tick(60)
 
 # GAME OVER
 def game_over():
-    game_over_text = game_over_font.render("GAME OVER!", False, white)
-    play_again_text = play_again_font.render("PLAY AGAIN", False, white)
-    render = screen.blit(game_over_text, (w/2-game_over_text.get_width()/2, h/2-game_over_text.get_height()))
-    render
-    screen.blit(play_again_text, (render.centerx, render.bottom))
+    game_over_text = "game over"
+    play_again_text = "play again"
+    quit_text = "quit"
+
+    game_over_surface = large_font.render(game_over_text, False, white)
+    game_over_rect = game_over_surface.get_rect(centerx=w//2, bottom=h//2)
+
+    play_again_surface = main_font.render(play_again_text, False, white)
+    play_again_rect = play_again_surface.get_rect(midtop=game_over_rect.midbottom)
+
+    quit_surface = main_font.render(quit_text, False, white)
+    quit_rect = quit_surface.get_rect(midtop=play_again_rect.midbottom)
+
+    mouse_pos = pygame.mouse.get_pos()
+    
+    if play_again_rect.collidepoint(mouse_pos):
+        play_again_surface = main_font.render(play_again_text, False, red)
+    if quit_rect.collidepoint(mouse_pos):
+        quit_surface = main_font.render(quit_text, False, red)
+    
+    screen.blit(game_over_surface, game_over_rect)
+    screen.blit(play_again_surface, play_again_rect)
+    screen.blit(quit_surface, quit_rect)
 
 
-        
 
 
 def run():
@@ -217,11 +249,11 @@ def run():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+
         
         #GAME LOGIG
+
         play_loop()
-        if len(characters) in [score for char, score in count_characters(characters).items()]:
-            game_over()
         
         #UPDATE SCREEN
         pygame.display.flip()
