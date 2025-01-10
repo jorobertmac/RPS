@@ -156,7 +156,63 @@ def make_characters():
 make_characters()
 # START SCREEN
 def start_screen():
-    ...
+    running = True
+    rock_click = False
+    paper_click = False
+    scissors_click = False
+
+    while running:
+        pygame_events = pygame.event.get()
+        for event in pygame_events:
+            if event.type == pygame.QUIT:
+                running = False
+                pygame.quit()
+                sys.exit()
+        who_win_text = "who will win?"
+        who_win_surface = large_font.render(who_win_text, False, white)
+        who_win_rect = who_win_surface.get_rect(centerx=w//2, bottom=h//3)
+
+        rock_text = 'rock'
+        rock_surface = main_font.render(rock_text, False, red if rock_click else white)
+        rock_rect = rock_surface.get_rect(midtop=who_win_rect.midbottom)
+        
+        paper_text = 'paper'
+        paper_surface = main_font.render(paper_text, False, red if paper_click else white)
+        paper_rect = paper_surface.get_rect(midtop=rock_rect.midbottom)
+
+        scissors_text = 'scissors'
+        scissors_surface = main_font.render(scissors_text, False, red if scissors_click else white)
+        scissors_rect = scissors_surface.get_rect(midtop=paper_rect.midbottom)
+
+        mouse_pos = pygame.mouse.get_pos()
+
+        if rock_rect.collidepoint(mouse_pos):
+            rock_surface = main_font.render(rock_text, False, red)
+            for event in pygame_events:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    rock_click=True
+        if paper_rect.collidepoint(mouse_pos):
+            paper_surface = main_font.render(paper_text, False, red)
+            for event in pygame_events:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    paper_click=True
+        if scissors_rect.collidepoint(mouse_pos):
+            scissors_surface = main_font.render(scissors_text, False, red)
+            for event in pygame_events:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    scissors_click=True
+
+
+
+        screen.fill(dark_gray)
+        screen.blit(who_win_surface, who_win_rect)
+        screen.blit(rock_surface, rock_rect)
+        screen.blit(paper_surface, paper_rect)
+        screen.blit(scissors_surface, scissors_rect)
+
+
+        pygame.display.flip()
+        clock.tick(60)
 
 # MAIN GAME LOOP
 def play_loop():
