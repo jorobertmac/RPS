@@ -278,9 +278,9 @@ def play_loop():
 def game_over():
     pygame_events = pygame.event.get()
 
-    game_over_text = "game over"
-    play_again_text = '"N" new game'
-    quit_text = '"Q" quit'
+    game_over_text = 'game over'
+    play_again_text = 'play game'
+    quit_text = 'quit'
 
     game_over_surface = large_font.render(game_over_text, False, white)
     game_over_rect = game_over_surface.get_rect(centerx=w//2, bottom=h//2)
