@@ -183,23 +183,38 @@ def start_screen():
         who_win_surface = large_font.render(who_win_text, False, white)
         who_win_rect = who_win_surface.get_rect(centerx=w//2, bottom=h//3)
 
-        rock_text = 'rock'
+        rock_text = 'rock: press R'
         rock_surface = main_font.render(rock_text, False, green if rock_click else white)
         rock_rect = rock_surface.get_rect(midtop=who_win_rect.midbottom)
         
-        paper_text = 'paper'
+        paper_text = 'paper: press P'
         paper_surface = main_font.render(paper_text, False, green if paper_click else white)
         paper_rect = paper_surface.get_rect(midtop=rock_rect.midbottom)
 
-        scissors_text = 'scissors'
+        scissors_text = 'scissors: press S'
         scissors_surface = main_font.render(scissors_text, False, green if scissors_click else white)
         scissors_rect = scissors_surface.get_rect(midtop=paper_rect.midbottom)
 
-        confirm_text = f'press enter to confirm: {choice()}'
+        confirm_text = f'press SPACE to confirm: {choice()}'
         confirm_surface = main_font.render(confirm_text, False, white)
         confirm_rect = confirm_surface.get_rect(midbottom=(w//2, h-10))
 
         mouse_pos = pygame.mouse.get_pos()
+
+        for event in pygame_events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    rock_click=True
+                    paper_click=False
+                    scissors_click=False
+                if event.key == pygame.K_p:
+                    rock_click=False
+                    paper_click=True
+                    scissors_click=False
+                if event.key == pygame.K_s:
+                    rock_click=False
+                    paper_click=False
+                    scissors_click=True
 
         if rock_rect.collidepoint(mouse_pos):
             rock_surface = main_font.render(rock_text, False, green if rock_click else red)
@@ -219,6 +234,7 @@ def start_screen():
             scissors_surface = main_font.render(scissors_text, False, green if scissors_click else red)
             for event in pygame_events:
                 if event.type == pygame.MOUSEBUTTONDOWN:
+                    
                     rock_click=False
                     paper_click=False
                     scissors_click=True
@@ -235,7 +251,7 @@ def start_screen():
             screen.blit(confirm_surface, confirm_rect)
         for event in pygame_events:
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
+                if event.key == pygame.K_SPACE:
                     running = False
                 
             
@@ -248,7 +264,7 @@ def start_screen():
     return choice()
 
 # MAIN GAME LOOP
-def play_loop(choice: str):
+def play_loop(player_choice: str):
     running = True
     count_down = 20
     while running:
@@ -307,6 +323,9 @@ def play_loop(choice: str):
             count_down -= 1
         if count_down <= 0:
             running = False
+            for char, score in totals.items():
+                if len(characters) == score:
+                    return char
 
         #UPDATE SCREEN
         pygame.display.flip()
@@ -314,7 +333,7 @@ def play_loop(choice: str):
 
 
 # GAME OVER
-def game_over():
+def game_over(player_choice: str, winning_char: str):
     running = True
     while running:
         pygame_events = pygame.event.get()
@@ -325,19 +344,42 @@ def game_over():
                 sys.exit()
 
         game_over_text = 'game over'
-        play_again_text = 'new game'
-        quit_text = 'quit'
-
         game_over_surface = large_font.render(game_over_text, False, white)
-        game_over_rect = game_over_surface.get_rect(centerx=w//2, bottom=h//2)
+        game_over_rect = game_over_surface.get_rect(centerx=w//2, bottom=h//4)
 
+        you_lost_text = 'you lost'
+        you_lost_surface = large_font.render(you_lost_text, False, red)
+        you_lost_rect = you_lost_surface.get_rect(midtop=game_over_rect.midbottom)
+        
+        you_won_text = 'you won'
+        you_won_surface = large_font.render(you_won_text, False, green)
+        you_won_rect = you_won_surface.get_rect(centerx=w//2, bottom=h//4)
+
+        play_again_text = 'new game: press N'
         play_again_surface = main_font.render(play_again_text, False, white)
         play_again_rect = play_again_surface.get_rect(midtop=game_over_rect.midbottom)
 
+        quit_text = 'quit: press Q'
         quit_surface = main_font.render(quit_text, False, white)
         quit_rect = quit_surface.get_rect(midtop=play_again_rect.midbottom)
 
+        def player_won():
+
+
+
+
+
         mouse_pos = pygame.mouse.get_pos()
+        for event in pygame_events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_n:
+                    characters.clear()
+                    make_characters()
+                    running = False
+                if event.key == pygame.K_q:
+                    pygame.quit()
+                    sys.exit()
+
         
         if play_again_rect.collidepoint(mouse_pos):
             play_again_surface = main_font.render(play_again_text, False, red)
@@ -375,9 +417,9 @@ def run():
 
         
         #GAME LOGIG
-        choice = start_screen()
-        play_loop(choice)
-        game_over()
+        player_choice = start_screen()
+        winning_char = play_loop(player_choice)
+        game_over(player_choice, winning_char)
         
         #UPDATE SCREEN
         pygame.display.flip()
