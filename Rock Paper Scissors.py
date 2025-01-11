@@ -13,6 +13,7 @@ black = (0,0,0)
 dark_gray = (30,30,30)
 white = (255,255,255)
 red = (255, 15, 15)
+green = (15,255,15)
 
 screen = pygame.display.set_mode((w,h))
 pygame.display.set_caption("Pock, Scaper, Rissors")
@@ -157,9 +158,19 @@ make_characters()
 # START SCREEN
 def start_screen():
     running = True
+
     rock_click = False
     paper_click = False
     scissors_click = False
+
+    def choice():
+        if rock_click:
+            return 'rock'
+        elif paper_click:
+            return 'paper'
+        elif scissors_click:
+            return 'scissors'
+        return False
 
     while running:
         pygame_events = pygame.event.get()
@@ -173,34 +184,45 @@ def start_screen():
         who_win_rect = who_win_surface.get_rect(centerx=w//2, bottom=h//3)
 
         rock_text = 'rock'
-        rock_surface = main_font.render(rock_text, False, red if rock_click else white)
+        rock_surface = main_font.render(rock_text, False, green if rock_click else white)
         rock_rect = rock_surface.get_rect(midtop=who_win_rect.midbottom)
         
         paper_text = 'paper'
-        paper_surface = main_font.render(paper_text, False, red if paper_click else white)
+        paper_surface = main_font.render(paper_text, False, green if paper_click else white)
         paper_rect = paper_surface.get_rect(midtop=rock_rect.midbottom)
 
         scissors_text = 'scissors'
-        scissors_surface = main_font.render(scissors_text, False, red if scissors_click else white)
+        scissors_surface = main_font.render(scissors_text, False, green if scissors_click else white)
         scissors_rect = scissors_surface.get_rect(midtop=paper_rect.midbottom)
+
+        confirm_text = f'press enter to confirm: {choice()}'
+        confirm_surface = main_font.render(confirm_text, False, white)
+        confirm_rect = confirm_surface.get_rect(midbottom=(w//2, h-10))
 
         mouse_pos = pygame.mouse.get_pos()
 
         if rock_rect.collidepoint(mouse_pos):
-            rock_surface = main_font.render(rock_text, False, red)
+            rock_surface = main_font.render(rock_text, False, green if rock_click else red)
             for event in pygame_events:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     rock_click=True
+                    paper_click=False
+                    scissors_click=False
         if paper_rect.collidepoint(mouse_pos):
-            paper_surface = main_font.render(paper_text, False, red)
+            paper_surface = main_font.render(paper_text, False, green if paper_click else red)
             for event in pygame_events:
                 if event.type == pygame.MOUSEBUTTONDOWN:
+                    rock_click=False
                     paper_click=True
+                    scissors_click=False
         if scissors_rect.collidepoint(mouse_pos):
-            scissors_surface = main_font.render(scissors_text, False, red)
+            scissors_surface = main_font.render(scissors_text, False, green if scissors_click else red)
             for event in pygame_events:
                 if event.type == pygame.MOUSEBUTTONDOWN:
+                    rock_click=False
+                    paper_click=False
                     scissors_click=True
+        
 
 
 
@@ -209,14 +231,26 @@ def start_screen():
         screen.blit(rock_surface, rock_rect)
         screen.blit(paper_surface, paper_rect)
         screen.blit(scissors_surface, scissors_rect)
+        if choice():
+            screen.blit(confirm_surface, confirm_rect)
+        for event in pygame_events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    running = False
+                
+            
+
 
 
         pygame.display.flip()
         clock.tick(60)
 
+    return choice()
+
 # MAIN GAME LOOP
-def play_loop():
+def play_loop(choice: str):
     running = True
+    count_down = 20
     while running:
         pygame_events = pygame.event.get()
         for event in pygame_events:
@@ -246,6 +280,7 @@ def play_loop():
         paper_score = main_font.render(f"{totals['paper']:02}", False, score_color("paper"))
         scissors_score = main_font.render(f"{totals['scissors']:02}", False, score_color("scissors"))
         
+        
         # UPDATE CHARACTERS
         for i, character in enumerate(characters):
             for j in range(i+1, len(characters)):
@@ -269,47 +304,63 @@ def play_loop():
         screen.blit(scissors_score, (w-scissors_score.get_width()-10, h-scissors_score.get_height()-10))
 
         if len(characters) in [score for char, score in count_characters(characters).items()]:
-            game_over()
+            count_down -= 1
+        if count_down <= 0:
+            running = False
+
         #UPDATE SCREEN
         pygame.display.flip()
         clock.tick(60)
 
+
 # GAME OVER
 def game_over():
-    pygame_events = pygame.event.get()
-
-    game_over_text = 'game over'
-    play_again_text = 'play game'
-    quit_text = 'quit'
-
-    game_over_surface = large_font.render(game_over_text, False, white)
-    game_over_rect = game_over_surface.get_rect(centerx=w//2, bottom=h//2)
-
-    play_again_surface = main_font.render(play_again_text, False, white)
-    play_again_rect = play_again_surface.get_rect(midtop=game_over_rect.midbottom)
-
-    quit_surface = main_font.render(quit_text, False, white)
-    quit_rect = quit_surface.get_rect(midtop=play_again_rect.midbottom)
-
-    mouse_pos = pygame.mouse.get_pos()
-    
-    if play_again_rect.collidepoint(mouse_pos):
-        play_again_surface = main_font.render(play_again_text, False, red)
+    running = True
+    while running:
+        pygame_events = pygame.event.get()
         for event in pygame_events:
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                characters.clear()
-                make_characters()
-
-    if quit_rect.collidepoint(mouse_pos):
-        quit_surface = main_font.render(quit_text, False, red)
-        for event in pygame_events:
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.QUIT:
+                running = False
                 pygame.quit()
                 sys.exit()
-    
-    screen.blit(game_over_surface, game_over_rect)
-    screen.blit(play_again_surface, play_again_rect)
-    screen.blit(quit_surface, quit_rect)
+
+        game_over_text = 'game over'
+        play_again_text = 'new game'
+        quit_text = 'quit'
+
+        game_over_surface = large_font.render(game_over_text, False, white)
+        game_over_rect = game_over_surface.get_rect(centerx=w//2, bottom=h//2)
+
+        play_again_surface = main_font.render(play_again_text, False, white)
+        play_again_rect = play_again_surface.get_rect(midtop=game_over_rect.midbottom)
+
+        quit_surface = main_font.render(quit_text, False, white)
+        quit_rect = quit_surface.get_rect(midtop=play_again_rect.midbottom)
+
+        mouse_pos = pygame.mouse.get_pos()
+        
+        if play_again_rect.collidepoint(mouse_pos):
+            play_again_surface = main_font.render(play_again_text, False, red)
+            for event in pygame_events:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    characters.clear()
+                    make_characters()
+                    running = False
+
+        if quit_rect.collidepoint(mouse_pos):
+            quit_surface = main_font.render(quit_text, False, red)
+            for event in pygame_events:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    pygame.quit()
+                    sys.exit()
+        
+        screen.blit(game_over_surface, game_over_rect)
+        screen.blit(play_again_surface, play_again_rect)
+        screen.blit(quit_surface, quit_rect)
+        
+        pygame.display.flip()
+        clock.tick(60)
+
 
 
 
@@ -324,8 +375,9 @@ def run():
 
         
         #GAME LOGIG
-        start_screen()
-        play_loop()
+        choice = start_screen()
+        play_loop(choice)
+        game_over()
         
         #UPDATE SCREEN
         pygame.display.flip()
