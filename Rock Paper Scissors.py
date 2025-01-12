@@ -279,7 +279,9 @@ def start_screen():
 def play_loop(player_choice: str):
     running = True
     count_down = 20
+    timer = 0
     while running:
+        timer += 1/60
         pygame_events = pygame.event.get()
         for event in pygame_events:
             if event.type == pygame.QUIT:
@@ -316,6 +318,20 @@ def play_loop(player_choice: str):
         player_choice_text = f'you chose: {player_choice}'
         player_choice_surface = small_font.render(player_choice_text, False, white)
         player_choice_rect = player_choice_surface.get_rect(right=w-10, top=10)
+
+        timer_text = f'{timer:.2f}'
+
+        second_text = 'sec'
+        seconds_text = 'secs'
+        minute_text = 'min'
+        minutes_text = 'mins'
+        hour_text = 'hour'
+        hours_text = 'hours'
+
+        timer_box1_num = ...
+
+        timer_surface = small_font.render(timer_text, False, white)
+        timer_rect = timer_surface.get_rect(left=10, top=10)
         
         
         # UPDATE CHARACTERS
@@ -329,6 +345,8 @@ def play_loop(player_choice: str):
         #DRAW ON SCREEN
         screen.fill(dark_gray)
 
+        screen.blit(player_choice_surface, player_choice_rect)
+        screen.blit(timer_surface, timer_rect)
         for character in characters:
             character.draw(screen)
         
@@ -340,7 +358,6 @@ def play_loop(player_choice: str):
         screen.blit(paper_score, (w/2 + paper_score.get_width()/2, h-paper_score.get_height()-10))
         screen.blit(scissors_score, (w-scissors_score.get_width()-10, h-scissors_score.get_height()-10))
 
-        screen.blit(player_choice_surface, player_choice_rect)
 
         if len(characters) in [score for char, score in count_characters(characters).items()]:
             count_down -= 1
