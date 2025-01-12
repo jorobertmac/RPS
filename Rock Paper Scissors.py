@@ -27,6 +27,7 @@ scissors = pygame.image.load("scissors.png")
 # FONTS
 main_font = pygame.font.SysFont("Ariel", 60)
 large_font = pygame.font.SysFont("Ariel", 150)
+small_font = pygame.font.SysFont("Ariel", 35)
 
 class Character:
     def __init__(self, image: pygame.Surface, x: int, y: int) -> None:
@@ -149,9 +150,14 @@ def make_characters():
 
     # TEST
     else:
-        for _ in range(55):
+        r=1
+        p=1
+        s=1
+        for _ in range(r):
             characters.append(Character(rock, randint(0, w-rock.get_width()), randint(0, h-rock.get_height())))
-        for _ in range(5):
+        for _ in range(p):
+            characters.append(Character(paper, randint(0, w-paper.get_width()), randint(0, h-paper.get_height())))
+        for _ in range(s):
             characters.append(Character(scissors, randint(0, w-scissors.get_width()), randint(0, h-scissors.get_height())))
 
 make_characters()
@@ -179,6 +185,12 @@ def start_screen():
                 running = False
                 pygame.quit()
                 sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    running = False
+                    pygame.quit()
+                    sys.exit()
+
         who_win_text = "who will win?"
         who_win_surface = large_font.render(who_win_text, False, white)
         who_win_rect = who_win_surface.get_rect(centerx=w//2, bottom=h//3)
@@ -274,6 +286,11 @@ def play_loop(player_choice: str):
                 running = False
                 pygame.quit()
                 sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    running = False
+                    pygame.quit()
+                    sys.exit()
         
         totals = count_characters(characters)
 
@@ -295,6 +312,10 @@ def play_loop(player_choice: str):
         rock_score = main_font.render(f"{totals['rock']:02}", False, score_color("rock"))
         paper_score = main_font.render(f"{totals['paper']:02}", False, score_color("paper"))
         scissors_score = main_font.render(f"{totals['scissors']:02}", False, score_color("scissors"))
+
+        player_choice_text = f'you chose: {player_choice}'
+        player_choice_surface = small_font.render(player_choice_text, False, white)
+        player_choice_rect = player_choice_surface.get_rect(right=w-10, top=10)
         
         
         # UPDATE CHARACTERS
@@ -318,6 +339,8 @@ def play_loop(player_choice: str):
         screen.blit(rock_score, (rock_text.get_width()+ 10 + 10, h-rock_score.get_height()-10))
         screen.blit(paper_score, (w/2 + paper_score.get_width()/2, h-paper_score.get_height()-10))
         screen.blit(scissors_score, (w-scissors_score.get_width()-10, h-scissors_score.get_height()-10))
+
+        screen.blit(player_choice_surface, player_choice_rect)
 
         if len(characters) in [score for char, score in count_characters(characters).items()]:
             count_down -= 1
@@ -347,27 +370,34 @@ def game_over(player_choice: str, winning_char: str):
         game_over_surface = large_font.render(game_over_text, False, white)
         game_over_rect = game_over_surface.get_rect(centerx=w//2, bottom=h//4)
 
-        you_lost_text = 'you lost'
-        you_lost_surface = large_font.render(you_lost_text, False, red)
-        you_lost_rect = you_lost_surface.get_rect(midtop=game_over_rect.midbottom)
+        winning_char_text = f'{winning_char} wins'
+        winning_char_surface = large_font.render(winning_char_text, False, white)
+        winning_char_rect = winning_char_surface.get_rect(center=(w//2, h//4))
+        if player_choice == winning_char:
+            won_lost = 'won'
+        else:
+            won_lost = 'lost'
+
+        won_lost_text = f'you {won_lost}'
+        won_lost_surface = large_font.render(won_lost_text, False, green if won_lost == 'won' else red)
+        won_lost_rect = won_lost_surface.get_rect(midtop=winning_char_rect.midbottom)
         
-        you_won_text = 'you won'
-        you_won_surface = large_font.render(you_won_text, False, green)
-        you_won_rect = you_won_surface.get_rect(centerx=w//2, bottom=h//4)
+        # you_lost_text = 'you lost'
+        # you_lost_surface = large_font.render(you_lost_text, False, red)
+        # you_lost_rect = you_lost_surface.get_rect(midtop=game_over_rect.midbottom)
+        
+        # you_won_text = 'you won'
+        # you_won_surface = large_font.render(you_won_text, False, green)
+        # you_won_rect = you_won_surface.get_rect(centerx=w//2, bottom=h//4)
+
 
         play_again_text = 'new game: press N'
         play_again_surface = main_font.render(play_again_text, False, white)
-        play_again_rect = play_again_surface.get_rect(midtop=game_over_rect.midbottom)
+        play_again_rect = play_again_surface.get_rect(midtop=won_lost_rect.midbottom)
 
         quit_text = 'quit: press Q'
         quit_surface = main_font.render(quit_text, False, white)
         quit_rect = quit_surface.get_rect(midtop=play_again_rect.midbottom)
-
-        def player_won():
-
-
-
-
 
         mouse_pos = pygame.mouse.get_pos()
         for event in pygame_events:
@@ -396,7 +426,9 @@ def game_over(player_choice: str, winning_char: str):
                     pygame.quit()
                     sys.exit()
         
-        screen.blit(game_over_surface, game_over_rect)
+        screen.blit(winning_char_surface, winning_char_rect)
+        screen.blit(won_lost_surface, won_lost_rect)
+        # screen.blit(game_over_surface, game_over_rect)
         screen.blit(play_again_surface, play_again_rect)
         screen.blit(quit_surface, quit_rect)
         
