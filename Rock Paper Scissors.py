@@ -140,7 +140,7 @@ def count_characters(list: list[Character]):
     return {"rock": total_rock, "paper": total_paper, "scissors": total_scissors}
 
 # MAKE CHARACTERS AND APPEND TO -characters- LIST
-test = True
+test = False
 def make_characters():
     if not test:
         for _ in range(chars):
